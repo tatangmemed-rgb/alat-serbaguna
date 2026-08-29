@@ -5,6 +5,11 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'APK/**'
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -28,7 +33,17 @@ jobs:
       - name: Build Debug APK
         run: gradle assembleDebug
 
-      - name: Upload APK
+      - name: Simpan APK ke repository
+        run: |
+          mkdir -p APK
+          cp app/build/outputs/apk/debug/app-debug.apk APK/Alat-Serbaguna.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add APK/Alat-Serbaguna.apk
+          git commit -m "Update APK hasil build" || echo "Tidak ada perubahan APK"
+          git push
+
+      - name: Upload APK sebagai artifact
         uses: actions/upload-artifact@v4
         with:
           name: Alat-Serbaguna-APK
